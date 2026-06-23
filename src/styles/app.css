@@ -190,19 +190,23 @@ button { font-family: inherit; }
 .phase:first-of-type { margin-top: 6px; }
 [data-theme="dark"] .phase { background: linear-gradient(120deg, #0B201D 0%, #14322D 50%, #1B423B 100%); }
 
-/* rotating gradient frame — Gemini-style */
+/* soft multi-hue rotating frame — Gemini-style */
 .phase::before {
-  content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1.5px;
-  background: conic-gradient(from var(--phase-ang), var(--coral), #36E3C6, #1A4238, #36E3C6, var(--coral));
+  content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1.6px;
+  background: conic-gradient(from var(--phase-ang), #FF7B52, #8AB4FF, #B98CFF, #36E3C6, #FF7B52);
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor; mask-composite: exclude;
-  animation: phaseSpin 5s linear infinite; pointer-events: none; z-index: 2;
+  animation: phaseSpin 6s linear infinite; pointer-events: none; z-index: 2;
+  opacity: .9;
 }
-/* soft rotating glow halo behind the banner */
+/* soft, segmented (notched) rotating glow halo behind the banner */
 .phase::after {
-  content: ""; position: absolute; inset: -2px; border-radius: inherit; z-index: -1;
-  background: conic-gradient(from var(--phase-ang), transparent 0%, var(--coral) 12%, transparent 30%, #36E3C6 55%, transparent 74%, var(--coral) 92%, transparent 100%);
-  filter: blur(12px); opacity: .5; animation: phaseSpin 5s linear infinite; pointer-events: none;
+  content: ""; position: absolute; inset: -5px; border-radius: calc(var(--r-lg) + 4px); z-index: -1;
+  background: conic-gradient(from var(--phase-ang),
+    transparent 0 5%, #FF7B52 14%, transparent 23% 31%,
+    #8AB4FF 40%, #B98CFF 50%, transparent 59% 67%,
+    #36E3C6 77%, transparent 87% 100%);
+  filter: blur(16px); opacity: .62; animation: phaseSpin 6s linear infinite; pointer-events: none;
 }
 @keyframes phaseSpin { to { --phase-ang: 360deg; } }
 @media (prefers-reduced-motion: reduce) { .phase::before, .phase::after { animation: none; } }
