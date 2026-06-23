@@ -14,7 +14,8 @@ GEO/AEO kontrol listesini interaktif bir dashboard'a dönüştüren, **Inbound**
 - **Alt görevlere toplu uygulama (⤓)** — ana görevdeki Durum / Sorumlu / Marka Notu, tek tıkla tüm alt görevlere yansıtılır
 - **KPI şeridi** — tamamlanma %, seçili madde, önceliğe/faza göre kırılım
 - **Filtreler** — arama + Faz / Görev Tipi / Öncelik / Kanal + "Sadece seçili"
-- **Birebir Excel export** — yalnızca tikli maddeler + ilgili Faz/bölüm başlıkları; orijinal `.xlsx` ile **yapı olarak bire bir** (sütun genişlikleri, donmuş satırlar, Durum dropdown'u), **renkler Inbound paletine çevrilmiş** (lacivert→teal, mavi→coral). Düzenlenen Durum/Sorumlu/Marka Notları ilgili kolonlara yazılır.
+- **Birebir Excel export** — yalnızca tikli maddeler + ilgili Faz/bölüm başlıkları; kaynak `.xlsx` ile **yapı olarak bire bir** (sütun genişlikleri, donmuş satırlar, Durum dropdown'u). Düzenlenen Durum/Sorumlu/Marka Notları ilgili kolonlara yazılır.
+- **Inbound renkli kaynak Excel** — `GEO-AEO-Checklist-v5.xlsx` Inbound paletine çevrildi (lacivert→teal, mavi→coral); export bu paleti olduğu gibi taşır. E-Ticaret'teki 173 otomatik/placeholder Detay açıklaması düzgün, anlamlı Türkçe açıklamalarla değiştirildi (bkz. `scripts/clean_and_recolor.py`).
 - **Koyu mod** + kalıcılık (seçimler, notlar, açık/kapalı durum tarayıcıda `localStorage`'da saklanır)
 
 ## Çalıştırma
