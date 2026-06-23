@@ -1,0 +1,89 @@
+/* ============================================================
+   Inbound × Vitra — design tokens
+   Colors + type from the Inbound design system; component scale
+   and dashboard surfaces from the VitrA dashboard system.
+   ============================================================ */
+
+/* Fonts (Bricolage Grotesque + Outfit) are loaded via Google Fonts in index.html. */
+
+:root {
+  /* Brand anchors (Inbound) */
+  --coral: #FF7B52;
+  --coral-tint: #FFE3D8;
+  --coral-deep: #E85F36;
+  --teal: #10332F;
+  --teal-soft: #1A4238;
+  --mint: #E8F5E9;
+
+  /* Neutrals */
+  --white: #FFFFFF;
+  --ink: #10332F;
+  --ink-2: #4A4A4A;
+  --ink-3: #8A8A8A;
+  --line: #E5E7E5;
+  --line-soft: #F0EDE8;
+  --bg: #FAFAF8;
+  --bg-card: #FFFFFF;
+  --surface: #F6F5F1;
+
+  /* State / data-viz */
+  --red: #D32F2F;
+  --red-wash: #FFE5E7;
+  --green: #2E7D32;
+  --green-wash: #DCF2DD;
+  --gold: #F5A623;
+  --gold-wash: #FDF0D5;
+  --blue: #1967D2;
+  --blue-wash: #E8F0FE;
+
+  /* Semantic accent (Inbound coral) */
+  --accent: var(--coral);
+  --accent-deep: var(--coral-deep);
+  --accent-wash: var(--coral-tint);
+
+  /* Type families */
+  --font-display: 'Bricolage Grotesque', 'Calibri', system-ui, sans-serif;
+  --font-body: 'Outfit', 'Calibri', system-ui, sans-serif;
+
+  /* Radii */
+  --r-xs: 4px; --r-sm: 8px; --r-md: 12px; --r-lg: 16px; --r-xl: 20px; --r-pill: 999px;
+
+  /* Spacing (8pt) */
+  --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px; --s-5: 20px; --s-6: 24px; --s-8: 32px; --s-10: 40px; --s-12: 48px;
+
+  /* Elevation */
+  --shadow-card: 0 1px 3px rgba(16,51,47,.06), 0 1px 2px rgba(16,51,47,.04);
+  --shadow-card-hover: 0 4px 16px rgba(16,51,47,.08), 0 2px 6px rgba(16,51,47,.04);
+  --shadow-pop: 0 12px 40px rgba(16,51,47,.18);
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --dur-fast: 140ms;
+  --dur-base: 220ms;
+
+  --logo-filter: none;
+}
+
+[data-theme="dark"] {
+  --coral: #FF8A63;
+  --coral-tint: #3A1F15;
+  --coral-deep: #FF7B52;
+  --teal: #F5F1EA;
+  --ink: #F5F1EA;
+  --ink-2: #B8B0A3;
+  --ink-3: #7A756C;
+  --line: #2A2E2C;
+  --line-soft: #1F2321;
+  --bg: #0D1715;
+  --bg-card: #141C1A;
+  --surface: #1A2421;
+  --white: #141C1A;
+  --red-wash: #3A1418;
+  --green-wash: #14321C;
+  --gold-wash: #322600;
+  --blue-wash: #16243C;
+  --shadow-card: 0 1px 3px rgba(0,0,0,.3);
+  --shadow-card-hover: 0 4px 20px rgba(0,0,0,.4);
+  --shadow-pop: 0 12px 40px rgba(0,0,0,.5);
+  --logo-filter: none;
+}
