@@ -19,6 +19,16 @@ const SHEETS: SheetName[] = ['E-Ticaret', 'Hizmet'];
 
 const ALL_SECTION_IDS = SHEETS.flatMap((s) => data[s].phases.flatMap((p) => p.sections.map((sec) => sec.id)));
 
+// Distinct "Sorumlu" values already present in the data — the seed dropdown list.
+const SEED_SORUMLU = (() => {
+  const set = new Set<string>();
+  for (const sn of SHEETS) for (const p of data[sn].phases) for (const s of p.sections) for (const t of s.tasks) {
+    if (t.sorumlu && t.sorumlu.trim()) set.add(t.sorumlu.trim());
+    for (const st of t.subtasks) if (st.sorumlu && st.sorumlu.trim()) set.add(st.sorumlu.trim());
+  }
+  return Array.from(set);
+})();
+
 const PRI_META = [
   { label: 'Kritik', cls: 'kritik', color: '#D32F2F' },
   { label: 'Yüksek', cls: 'yuksek', color: '#F5A623' },
@@ -48,8 +58,14 @@ export default function App() {
   const [edits, setEdits] = usePersistentState<EditsMap>('geo.edits', {});
   const [openSections, updateOpenSections] = usePersistentSet('geo.openSections', ALL_SECTION_IDS);
   const [openTasks, updateOpenTasks] = usePersistentSet('geo.openTasks');
+  const [extraSorumlu, setExtraSorumlu] = usePersistentState<string[]>('geo.sorumluOptions', []);
   const [filters, setFilters] = useState<Filters>(EMPTY_FILTERS);
   const [toast, setToast] = useState<string | null>(null);
+
+  const sorumluOptions = useMemo(
+    () => Array.from(new Set([...SEED_SORUMLU, ...extraSorumlu])).sort((a, b) => a.localeCompare(b, 'tr')),
+    [extraSorumlu],
+  );
 
   useEffect(() => { document.documentElement.setAttribute('data-theme', theme); }, [theme]);
   useEffect(() => { if (!toast) return; const t = setTimeout(() => setToast(null), 2600); return () => clearTimeout(t); }, [toast]);
@@ -74,6 +90,11 @@ export default function App() {
   const onEdit = (itemId: string, field: EditField, value: string) => {
     setEdits((prev) => ({ ...prev, [itemId]: { ...prev[itemId], [field]: value } }));
   };
+  const setSorumlu = (itemId: string, value: string) => {
+    onEdit(itemId, 'sorumlu', value);
+    const v = value.trim();
+    if (v && !SEED_SORUMLU.includes(v)) setExtraSorumlu((prev) => (prev.includes(v) ? prev : [...prev, v]));
+  };
   const applyToSubtasks = (task: import('./data/types').Task, field: EditField) => {
     if (!task.subtasks.length) return;
     const val = fieldVal((task as Record<EditField, string>)[field], edits[task.id], field);
@@ -87,7 +108,7 @@ export default function App() {
   };
 
   const ctx: TreeCtx = {
-    selected, edits, setMany, toggleId, onEdit, applyToSubtasks,
+    selected, edits, setMany, toggleId, onEdit, applyToSubtasks, sorumluOptions, setSorumlu,
     openTasks, toggleTask: (id) => updateOpenTasks((s) => { s.has(id) ? s.delete(id) : s.add(id); return s; }),
     openSections, toggleSection: (id) => updateOpenSections((s) => { s.has(id) ? s.delete(id) : s.add(id); return s; }),
     searchActive, vis,

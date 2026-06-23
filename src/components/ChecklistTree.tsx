@@ -1,6 +1,7 @@
 import { Fragment } from 'react';
 import { Checkbox } from './Checkbox';
-import { DurumSelect, fieldVal, EditField } from './EditFields';
+import { fieldVal, EditField } from './EditFields';
+import { StatusDropdown, AssigneeCombobox } from './Pickers';
 import { groupState, leafIds, priClass, splitPhaseTitle, splitSectionTitle } from '../lib/util';
 import type { EditsMap, Section, SheetData, Subtask, Task } from '../data/types';
 
@@ -11,6 +12,8 @@ export interface TreeCtx {
   toggleId: (id: string) => void;
   onEdit: (id: string, field: EditField, value: string) => void;
   applyToSubtasks: (task: Task, field: EditField) => void;
+  sorumluOptions: string[];
+  setSorumlu: (id: string, value: string) => void;
   openTasks: Set<string>;
   toggleTask: (id: string) => void;
   openSections: Set<string>;
@@ -62,15 +65,15 @@ function TaskTRow({ task, ctx, open }: { task: Task; ctx: TreeCtx; open: boolean
       </div>
       <div className="cc oncelik">{task.oncelik && <span className={'pri ' + priClass(task.oncelik)}>{task.oncelik}</span>}</div>
       <div className="cc edit">
-        <input className="cellfld" value={fieldVal(task.sorumlu, edit, 'sorumlu')} placeholder="Sorumlu" onChange={(e) => ctx.onEdit(task.id, 'sorumlu', e.target.value)} />
+        <AssigneeCombobox value={fieldVal(task.sorumlu, edit, 'sorumlu')} options={ctx.sorumluOptions} onChange={(v) => ctx.setSorumlu(task.id, v)} />
         {hasSubs && <ApplyDown onClick={() => ctx.applyToSubtasks(task, 'sorumlu')} />}
       </div>
       <div className="cc edit">
-        <DurumSelect value={fieldVal(task.durum, edit, 'durum')} onChange={(v) => ctx.onEdit(task.id, 'durum', v)} />
+        <StatusDropdown value={fieldVal(task.durum, edit, 'durum')} onChange={(v) => ctx.onEdit(task.id, 'durum', v)} />
         {hasSubs && <ApplyDown onClick={() => ctx.applyToSubtasks(task, 'durum')} />}
       </div>
       <div className="cc edit">
-        <input className="cellfld" value={fieldVal(task.markaNotlari, edit, 'markaNotlari')} placeholder="Marka notu" onChange={(e) => ctx.onEdit(task.id, 'markaNotlari', e.target.value)} />
+        <input className="cellfld" value={fieldVal(task.markaNotlari, edit, 'markaNotlari')} placeholder="Marka notu…" onChange={(e) => ctx.onEdit(task.id, 'markaNotlari', e.target.value)} />
         {hasSubs && <ApplyDown onClick={() => ctx.applyToSubtasks(task, 'markaNotlari')} />}
       </div>
     </div>
@@ -91,9 +94,9 @@ function SubTRow({ st, ctx }: { st: Subtask; ctx: TreeCtx }) {
         {st.detay && <div className="g-detay" title={st.detay}>{st.detay}</div>}
       </div>
       <div className="cc oncelik"><span className="muted-dash">·</span></div>
-      <div className="cc edit"><input className="cellfld" value={fieldVal(st.sorumlu, edit, 'sorumlu')} placeholder="Sorumlu" onChange={(e) => ctx.onEdit(st.id, 'sorumlu', e.target.value)} /></div>
-      <div className="cc edit"><DurumSelect value={fieldVal(st.durum, edit, 'durum')} onChange={(v) => ctx.onEdit(st.id, 'durum', v)} /></div>
-      <div className="cc edit"><input className="cellfld" value={fieldVal(st.markaNotlari, edit, 'markaNotlari')} placeholder="Marka notu" onChange={(e) => ctx.onEdit(st.id, 'markaNotlari', e.target.value)} /></div>
+      <div className="cc edit"><AssigneeCombobox value={fieldVal(st.sorumlu, edit, 'sorumlu')} options={ctx.sorumluOptions} onChange={(v) => ctx.setSorumlu(st.id, v)} /></div>
+      <div className="cc edit"><StatusDropdown value={fieldVal(st.durum, edit, 'durum')} onChange={(v) => ctx.onEdit(st.id, 'durum', v)} /></div>
+      <div className="cc edit"><input className="cellfld" value={fieldVal(st.markaNotlari, edit, 'markaNotlari')} placeholder="Marka notu…" onChange={(e) => ctx.onEdit(st.id, 'markaNotlari', e.target.value)} /></div>
     </div>
   );
 }
