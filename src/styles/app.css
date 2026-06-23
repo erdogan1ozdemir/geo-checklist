@@ -224,8 +224,8 @@ button { font-family: inherit; }
   border-bottom: 1px solid var(--line);
 }
 .ctbl-head .cc.th {
-  font-size: 11.5px; text-transform: uppercase; letter-spacing: .04em; font-weight: 700;
-  color: var(--ink-2); padding: 11px 12px; align-items: center;
+  font-size: 10px; text-transform: uppercase; letter-spacing: .06em; font-weight: 700;
+  color: var(--ink-2); padding: 9px 12px; align-items: center;
 }
 [data-theme="dark"] .ctbl-head { background: color-mix(in srgb, var(--ink) 5%, var(--bg-card)); }
 .cc { display: flex; align-items: center; padding: 9px 10px; border-bottom: 1px solid var(--line-soft); min-width: 0; }
@@ -255,12 +255,12 @@ button { font-family: inherit; }
 .tchev.open { transform: rotate(90deg); color: var(--accent); }
 .sub-marker { color: var(--ink-3); font-size: 13px; opacity: .6; }
 
-.g-name { font-size: 14px; font-weight: 600; color: var(--ink); line-height: 1.35; display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.g-name { font-size: 13.5px; font-weight: 600; color: var(--ink); line-height: 1.35; display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
 .g-name.sub { font-size: 12.5px; font-weight: 500; color: var(--ink-2); }
 .sub-badge { font-size: 10.5px; color: var(--ink-3); background: var(--line-soft); border-radius: 99px; padding: 1px 8px; font-weight: 700; font-family: var(--font-display); white-space: nowrap; }
 .g-tags { display: flex; flex-wrap: wrap; gap: 5px; }
 .g-detay {
-  font-size: 12px; color: var(--ink-2); line-height: 1.5;
+  font-size: 11.5px; color: var(--ink-2); line-height: 1.45;
   display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
 }
 
@@ -302,19 +302,19 @@ button { font-family: inherit; }
 [data-theme="dark"] .status-pill.st-hold { color: #9BB0C0; }
 
 /* Assignee chip + avatar */
-.assignee-chip { display: inline-flex; align-items: center; gap: 7px; min-width: 0; font-size: 12.5px; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.av { display: inline-flex; align-items: center; justify-content: center; width: 21px; height: 21px; border-radius: 50%; font-size: 9.5px; font-weight: 800; font-family: var(--font-display); flex-shrink: 0; letter-spacing: -.02em; }
+.assignee-chip { display: inline-flex; align-items: center; gap: 7px; min-width: 0; font-size: 12px; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.av { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 50%; font-size: 9px; font-weight: 800; font-family: var(--font-display); flex-shrink: 0; letter-spacing: -.02em; }
 
 /* ---------------- Popover ---------------- */
 .pop { background: var(--bg-card); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow-pop); padding: 5px; z-index: 1000; overflow: hidden; animation: popIn .14s var(--ease-out); }
 [data-theme="dark"] .pop { border-color: color-mix(in srgb, var(--ink) 14%, var(--line)); }
 @keyframes popIn { from { opacity: 0; transform: translateY(-4px) scale(.98); } to { opacity: 1; transform: none; } }
 .pop-combo { display: flex; flex-direction: column; }
-.pop-search { border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 7px 10px; font: inherit; font-size: 12.5px; color: var(--ink); outline: none; margin-bottom: 4px; }
+.pop-search { border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 7px 10px; font: inherit; font-size: 12px; color: var(--ink); outline: none; margin-bottom: 4px; }
 .pop-search::placeholder { color: var(--ink-3); }
 .pop-search:focus { border-color: var(--accent); box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 14%, transparent); }
 .pop-list { display: flex; flex-direction: column; gap: 1px; max-height: 264px; overflow-y: auto; }
-.pop-opt { display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; border: 0; background: transparent; border-radius: 8px; padding: 7px 9px; font: inherit; font-size: 12.5px; color: var(--ink); cursor: pointer; text-align: left; transition: background .1s; }
+.pop-opt { display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; border: 0; background: transparent; border-radius: 8px; padding: 7px 9px; font: inherit; font-size: 12px; color: var(--ink); cursor: pointer; text-align: left; transition: background .1s; }
 .pop-opt:hover { background: var(--surface); }
 .pop-opt.sel { background: color-mix(in srgb, var(--accent) 10%, transparent); }
 .pop-opt .pop-check { color: var(--accent-deep); font-weight: 800; flex-shrink: 0; font-size: 12px; }
