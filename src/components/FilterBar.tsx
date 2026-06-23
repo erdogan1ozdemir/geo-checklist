@@ -15,7 +15,7 @@ interface Props {
 }
 
 const PRI_COLOR: Record<string, string> = {
-  'Kritik': '#D32F2F', 'Yüksek': '#F5A623', 'Orta': '#1967D2', 'Düşük': '#8A8A8A', '—': '#8A8A8A',
+  'Kritik': '#D32F2F', 'Yüksek': '#F5A623', 'Orta': '#E0A800', 'Düşük': '#5FA36F', '—': '#8A8A8A',
 };
 
 export function FilterBar({ filters, facets, onChange, onSelectAllVisible, onClearAll, visibleSelectable, hasSelection, resultCount }: Props) {

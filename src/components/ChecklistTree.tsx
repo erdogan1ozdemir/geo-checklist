@@ -1,14 +1,16 @@
+import { Fragment } from 'react';
 import { Checkbox } from './Checkbox';
-import { TaskRow } from './TaskRow';
-import { groupState, leafIds, splitPhaseTitle, splitSectionTitle } from '../lib/util';
-import type { EditsMap, SheetData, Section, Task } from '../data/types';
+import { DurumSelect, fieldVal, EditField } from './EditFields';
+import { groupState, leafIds, priClass, splitPhaseTitle, splitSectionTitle } from '../lib/util';
+import type { EditsMap, Section, SheetData, Subtask, Task } from '../data/types';
 
 export interface TreeCtx {
   selected: Set<string>;
   edits: EditsMap;
   setMany: (ids: string[], on: boolean) => void;
   toggleId: (id: string) => void;
-  onEdit: (id: string, field: 'durum' | 'sorumlu' | 'markaNotlari', value: string) => void;
+  onEdit: (id: string, field: EditField, value: string) => void;
+  applyToSubtasks: (task: Task, field: EditField) => void;
   openTasks: Set<string>;
   toggleTask: (id: string) => void;
   openSections: Set<string>;
@@ -17,21 +19,91 @@ export interface TreeCtx {
   vis: Map<string, { visible: boolean; matchedSub: Set<string> }>;
 }
 
-function visibleTasksOf(section: Section, ctx: TreeCtx): Task[] {
-  return section.tasks.filter((t) => ctx.vis.get(t.id)?.visible);
-}
-
-function leafIdsOfTasks(tasks: Task[]): string[] {
-  return tasks.flatMap((t) => leafIds(t));
-}
-
 function pct(a: number, b: number) { return b === 0 ? 0 : Math.round((a / b) * 100); }
 
+function ApplyDown({ onClick }: { onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      className="apply-down"
+      title="Bu değeri tüm alt görevlere uygula"
+      onClick={(e) => { e.stopPropagation(); onClick(); }}
+    >⤓</button>
+  );
+}
+
+/* ---------------- Task row ---------------- */
+function TaskTRow({ task, ctx, open }: { task: Task; ctx: TreeCtx; open: boolean }) {
+  const hasSubs = task.subtasks.length > 0;
+  const ids = leafIds(task);
+  const gState = hasSubs ? groupState(ctx.selected, ids) : (ctx.selected.has(task.id) ? 'all' : 'none');
+  const selCount = ids.filter((id) => ctx.selected.has(id)).length;
+  const edit = ctx.edits[task.id];
+
+  return (
+    <div className={'ctrow task' + (selCount ? ' sel' : '')}>
+      <div className="cc cbx-cell"><Checkbox state={gState} onChange={() => ctx.setMany(ids, gState !== 'all')} label={task.aksiyon} /></div>
+      <div className="cc chev-cell">
+        {hasSubs && (
+          <button className={'tchev' + (open ? ' open' : '')} onClick={() => ctx.toggleTask(task.id)} aria-expanded={open} aria-label={open ? 'Kapat' : 'Aç'}>▶</button>
+        )}
+      </div>
+      <div className="cc gorev">
+        <div className="g-name" onClick={hasSubs ? () => ctx.toggleTask(task.id) : undefined} style={hasSubs ? { cursor: 'pointer' } : undefined}>
+          <span>{task.aksiyon}</span>
+          {hasSubs && <span className="sub-badge">{selCount ? `${selCount}/${ids.length}` : `${task.subtasks.length} adım`}</span>}
+        </div>
+        <div className="g-tags">
+          {task.gorevTipi && <span className="tag tip">{task.gorevTipi}</span>}
+          {task.kanal && <span className="tag kanal">{task.kanal}</span>}
+          {task.arac && task.arac !== '-' && <span className="tag arac" title={task.arac}>🧰 {task.arac}</span>}
+        </div>
+        {task.detay && <div className="g-detay" title={task.detay}>{task.detay}</div>}
+      </div>
+      <div className="cc oncelik">{task.oncelik && <span className={'pri ' + priClass(task.oncelik)}>{task.oncelik}</span>}</div>
+      <div className="cc edit">
+        <input className="cellfld" value={fieldVal(task.sorumlu, edit, 'sorumlu')} placeholder="Sorumlu" onChange={(e) => ctx.onEdit(task.id, 'sorumlu', e.target.value)} />
+        {hasSubs && <ApplyDown onClick={() => ctx.applyToSubtasks(task, 'sorumlu')} />}
+      </div>
+      <div className="cc edit">
+        <DurumSelect value={fieldVal(task.durum, edit, 'durum')} onChange={(v) => ctx.onEdit(task.id, 'durum', v)} />
+        {hasSubs && <ApplyDown onClick={() => ctx.applyToSubtasks(task, 'durum')} />}
+      </div>
+      <div className="cc edit">
+        <input className="cellfld" value={fieldVal(task.markaNotlari, edit, 'markaNotlari')} placeholder="Marka notu" onChange={(e) => ctx.onEdit(task.id, 'markaNotlari', e.target.value)} />
+        {hasSubs && <ApplyDown onClick={() => ctx.applyToSubtasks(task, 'markaNotlari')} />}
+      </div>
+    </div>
+  );
+}
+
+/* ---------------- Subtask row ---------------- */
+function SubTRow({ st, ctx }: { st: Subtask; ctx: TreeCtx }) {
+  const sel = ctx.selected.has(st.id);
+  const edit = ctx.edits[st.id];
+  const action = st.aksiyon.replace(/^→\s*/, '');
+  return (
+    <div className={'ctrow sub' + (sel ? ' sel' : '')}>
+      <div className="cc cbx-cell"><Checkbox state={sel} onChange={() => ctx.toggleId(st.id)} small label={action} /></div>
+      <div className="cc chev-cell"><span className="sub-marker">↳</span></div>
+      <div className="cc gorev">
+        <div className="g-name sub">{action}</div>
+        {st.detay && <div className="g-detay" title={st.detay}>{st.detay}</div>}
+      </div>
+      <div className="cc oncelik"><span className="muted-dash">·</span></div>
+      <div className="cc edit"><input className="cellfld" value={fieldVal(st.sorumlu, edit, 'sorumlu')} placeholder="Sorumlu" onChange={(e) => ctx.onEdit(st.id, 'sorumlu', e.target.value)} /></div>
+      <div className="cc edit"><DurumSelect value={fieldVal(st.durum, edit, 'durum')} onChange={(v) => ctx.onEdit(st.id, 'durum', v)} /></div>
+      <div className="cc edit"><input className="cellfld" value={fieldVal(st.markaNotlari, edit, 'markaNotlari')} placeholder="Marka notu" onChange={(e) => ctx.onEdit(st.id, 'markaNotlari', e.target.value)} /></div>
+    </div>
+  );
+}
+
+/* ---------------- Section ---------------- */
 function SectionGroup({ section, ctx }: { section: Section; ctx: TreeCtx }) {
-  const tasks = visibleTasksOf(section, ctx);
+  const tasks = section.tasks.filter((t) => ctx.vis.get(t.id)?.visible);
   if (!tasks.length) return null;
   const { emoji, text } = splitSectionTitle(section.title);
-  const ids = leafIdsOfTasks(tasks);
+  const ids = tasks.flatMap((t) => leafIds(t));
   const gState = groupState(ctx.selected, ids);
   const sel = ids.filter((id) => ctx.selected.has(id)).length;
   const open = ctx.openSections.has(section.id);
@@ -50,33 +122,37 @@ function SectionGroup({ section, ctx }: { section: Section; ctx: TreeCtx }) {
         </div>
       </div>
       {open && (
-        <div className="section-body">
-          {tasks.map((task) => {
-            const v = ctx.vis.get(task.id);
-            const forced = ctx.searchActive && !!v && v.matchedSub.size > 0;
-            const isOpen = ctx.openTasks.has(task.id) || forced;
-            return (
-              <TaskRow
-                key={task.id}
-                task={task}
-                selected={ctx.selected}
-                open={isOpen}
-                onToggleOpen={() => ctx.toggleTask(task.id)}
-                onToggleGroup={() => { const tids = leafIds(task); ctx.setMany(tids, groupState(ctx.selected, tids) !== 'all'); }}
-                onToggleSubtask={(id) => ctx.toggleId(id)}
-                edits={ctx.edits}
-                onEdit={ctx.onEdit}
-              />
-            );
-          })}
+        <div className="ctbl-wrap">
+          <div className="ctbl">
+            <div className="ctbl-head">
+              <div className="cc" /><div className="cc" />
+              <div className="cc th">Görev</div>
+              <div className="cc th">Öncelik</div>
+              <div className="cc th">Sorumlu</div>
+              <div className="cc th">Durum</div>
+              <div className="cc th">Marka Notu</div>
+            </div>
+            {tasks.map((task) => {
+              const v = ctx.vis.get(task.id);
+              const forced = ctx.searchActive && !!v && v.matchedSub.size > 0;
+              const topen = ctx.openTasks.has(task.id) || forced;
+              return (
+                <Fragment key={task.id}>
+                  <TaskTRow task={task} ctx={ctx} open={topen} />
+                  {topen && task.subtasks.map((st) => <SubTRow key={st.id} st={st} ctx={ctx} />)}
+                </Fragment>
+              );
+            })}
+          </div>
         </div>
       )}
     </div>
   );
 }
 
+/* ---------------- Tree root ---------------- */
 export function ChecklistTree({ sheet, ctx }: { sheet: SheetData; ctx: TreeCtx }) {
-  const phases = sheet.phases.filter((p) => p.sections.some((s) => visibleTasksOf(s, ctx).length > 0));
+  const phases = sheet.phases.filter((p) => p.sections.some((s) => s.tasks.some((t) => ctx.vis.get(t.id)?.visible)));
 
   if (!phases.length) {
     return (
@@ -91,8 +167,8 @@ export function ChecklistTree({ sheet, ctx }: { sheet: SheetData; ctx: TreeCtx }
   return (
     <div>
       {phases.map((phase) => {
-        const visTasks = phase.sections.flatMap((s) => visibleTasksOf(s, ctx));
-        const ids = leafIdsOfTasks(visTasks);
+        const visTasks = phase.sections.flatMap((s) => s.tasks.filter((t) => ctx.vis.get(t.id)?.visible));
+        const ids = visTasks.flatMap((t) => leafIds(t));
         const gState = groupState(ctx.selected, ids);
         const sel = ids.filter((id) => ctx.selected.has(id)).length;
         const { num, text } = splitPhaseTitle(phase.title);

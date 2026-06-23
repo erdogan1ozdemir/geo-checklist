@@ -7,6 +7,7 @@ import {
 } from './lib/util';
 import { buildFilteredWorkbook } from './lib/xlsxExport.js';
 import { computeExportPlan } from './lib/selection.js';
+import { fieldVal, EditField } from './components/EditFields';
 import { Topbar } from './components/Topbar';
 import { Tabs } from './components/Tabs';
 import { KpiStrip, Stats } from './components/KpiStrip';
@@ -21,8 +22,8 @@ const ALL_SECTION_IDS = SHEETS.flatMap((s) => data[s].phases.flatMap((p) => p.se
 const PRI_META = [
   { label: 'Kritik', cls: 'kritik', color: '#D32F2F' },
   { label: 'Yüksek', cls: 'yuksek', color: '#F5A623' },
-  { label: 'Orta', cls: 'orta', color: '#1967D2' },
-  { label: 'Düşük', cls: 'dusuk', color: '#8A8A8A' },
+  { label: 'Orta', cls: 'orta', color: '#E0A800' },
+  { label: 'Düşük', cls: 'dusuk', color: '#5FA36F' },
 ];
 
 function buildEditsByRow(sheet: SheetData, edits: EditsMap): Record<number, EditsMap[string]> {
@@ -70,12 +71,23 @@ export default function App() {
   // selection helpers
   const toggleId = (id: string) => updateSelected((s) => { s.has(id) ? s.delete(id) : s.add(id); return s; });
   const setMany = (ids: string[], on: boolean) => updateSelected((s) => { for (const id of ids) on ? s.add(id) : s.delete(id); return s; });
-  const onEdit = (itemId: string, field: 'durum' | 'sorumlu' | 'markaNotlari', value: string) => {
+  const onEdit = (itemId: string, field: EditField, value: string) => {
     setEdits((prev) => ({ ...prev, [itemId]: { ...prev[itemId], [field]: value } }));
+  };
+  const applyToSubtasks = (task: import('./data/types').Task, field: EditField) => {
+    if (!task.subtasks.length) return;
+    const val = fieldVal((task as Record<EditField, string>)[field], edits[task.id], field);
+    setEdits((prev) => {
+      const next = { ...prev };
+      for (const st of task.subtasks) next[st.id] = { ...next[st.id], [field]: val };
+      return next;
+    });
+    const labels: Record<EditField, string> = { durum: 'Durum', sorumlu: 'Sorumlu', markaNotlari: 'Marka Notu' };
+    setToast(`${labels[field]} → ${task.subtasks.length} alt göreve uygulandı`);
   };
 
   const ctx: TreeCtx = {
-    selected, edits, setMany, toggleId, onEdit,
+    selected, edits, setMany, toggleId, onEdit, applyToSubtasks,
     openTasks, toggleTask: (id) => updateOpenTasks((s) => { s.has(id) ? s.delete(id) : s.add(id); return s; }),
     openSections, toggleSection: (id) => updateOpenSections((s) => { s.has(id) ? s.delete(id) : s.add(id); return s; }),
     searchActive, vis,

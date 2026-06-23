@@ -16,6 +16,32 @@ import { unzipSync, zipSync, strToU8, strFromU8 } from 'fflate';
 export const DURUM_OPTIONS = ['Yapılmadı', 'Devam Ediyor', 'Tamamlandı', 'Beklemede', 'İptal'];
 const DURUM_LIST = DURUM_OPTIONS.join(',');
 
+/**
+ * Map the source workbook's blue palette to Inbound brand colors. Applied to
+ * styles.xml (and any borders/fonts that share these ARGB codes) so the exported
+ * file is recolored while keeping the exact same layout/structure.
+ */
+const COLOR_MAP = {
+  FF1F3864: 'FF10332F', // dark navy (title + header fill, task-text) -> teal
+  FF1F4E79: 'FF1A4238', // navy (phase banner) -> teal-soft
+  FF2E75B6: 'FFFF7B52', // blue (section banner) -> coral
+  FFE8F0FE: 'FFFFE3D8', // light blue (task rows) -> coral-tint
+  FFF2F2F2: 'FFF4F2EE', // light grey (subtask rows) -> warm off-white
+  FFF0F0F0: 'FFF4F2EE', // light grey (meta row) -> warm off-white
+  FFFF6B6B: 'FFE5534D', // Kritik -> Inbound-aligned red
+  FFFFB347: 'FFF5A623', // Yüksek -> Inbound gold
+  FFFFE066: 'FFFAD46B', // Orta -> soft amber
+  FF77DD77: 'FF8FD3A6', // Düşük -> soft Inbound green
+};
+
+function recolorStyles(stylesXml) {
+  let out = stylesXml;
+  for (const [from, to] of Object.entries(COLOR_MAP)) {
+    out = out.split(from).join(to);
+  }
+  return out;
+}
+
 // Editable field -> column letter
 const FIELD_COL = { sorumlu: 'I', durum: 'J', markaNotlari: 'K' };
 
@@ -171,8 +197,9 @@ export function buildFilteredWorkbook(originalBytes, exportsList) {
   const files = unzipSync(originalBytes);
   const out = {};
 
-  // Verbatim parts — this is what guarantees identical styling.
-  out['xl/styles.xml'] = files['xl/styles.xml'];
+  // Styles reused from the source (guarantees identical layout) but recolored to
+  // the Inbound palette; theme stays verbatim.
+  out['xl/styles.xml'] = strToU8(recolorStyles(strFromU8(files['xl/styles.xml'])));
   out['xl/theme/theme1.xml'] = files['xl/theme/theme1.xml'];
   if (files['docProps/core.xml']) out['docProps/core.xml'] = files['docProps/core.xml'];
 

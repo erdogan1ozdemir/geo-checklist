@@ -6,13 +6,15 @@ GEO/AEO kontrol listesini interaktif bir dashboard'a dönüştüren, **Inbound**
 
 ## Özellikler
 
+- **ClickUp tarzı tablo görünümü** — her madde bir satır; kolonlar: Görev · Öncelik · Sorumlu · Durum · Marka Notu. Görev Tipi / Kanal / Araç **etiket (tag)** olarak, **Detay açıklamalar** her satırda görünür.
 - **İki sekme:** E-Ticaret · Hizmet (her biri Faz → Bölüm → Ana görev → Alt görev hiyerarşisi)
 - **Açılır/kapanır alt görevler** — her ana görevin adımları gizlenip gösterilebilir
 - **Tick-checklist** — ana görev (tri-state grup), alt görev, bölüm ve faz seviyesinde seçim; **Tümünü seç / Temizle**
-- **Düzenlenebilir alanlar** — madde bazında **Durum** (dropdown), **Sorumlu**, **Marka Notları**
+- **Satır içi düzenlenebilir alanlar** — madde bazında **Durum** (dropdown), **Sorumlu**, **Marka Notları**
+- **Alt görevlere toplu uygulama (⤓)** — ana görevdeki Durum / Sorumlu / Marka Notu, tek tıkla tüm alt görevlere yansıtılır
 - **KPI şeridi** — tamamlanma %, seçili madde, önceliğe/faza göre kırılım
 - **Filtreler** — arama + Faz / Görev Tipi / Öncelik / Kanal + "Sadece seçili"
-- **Birebir Excel export** — yalnızca tikli maddeler + ilgili Faz/bölüm başlıkları; orijinal `.xlsx` ile **stil olarak bire bir** (renkler, fontlar, sütun genişlikleri, donmuş satırlar, Durum dropdown'u). Düzenlenen Durum/Sorumlu/Marka Notları ilgili kolonlara yazılır.
+- **Birebir Excel export** — yalnızca tikli maddeler + ilgili Faz/bölüm başlıkları; orijinal `.xlsx` ile **yapı olarak bire bir** (sütun genişlikleri, donmuş satırlar, Durum dropdown'u), **renkler Inbound paletine çevrilmiş** (lacivert→teal, mavi→coral). Düzenlenen Durum/Sorumlu/Marka Notları ilgili kolonlara yazılır.
 - **Koyu mod** + kalıcılık (seçimler, notlar, açık/kapalı durum tarayıcıda `localStorage`'da saklanır)
 
 ## Çalıştırma

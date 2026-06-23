@@ -8,16 +8,32 @@ import openpyxl
 ORIG = "../GEO-AEO-Checklist-v5.xlsx"
 EXP = "/tmp/test-export.xlsx"
 
+# Must mirror COLOR_MAP in src/lib/xlsxExport.js
+COLOR_MAP = {
+    "FF1F3864": "FF10332F", "FF1F4E79": "FF1A4238", "FF2E75B6": "FFFF7B52",
+    "FFE8F0FE": "FFFFE3D8", "FFF2F2F2": "FFF4F2EE", "FFF0F0F0": "FFF4F2EE",
+    "FFFF6B6B": "FFE5534D", "FFFFB347": "FFF5A623", "FFFFE066": "FFFAD46B",
+    "FF77DD77": "FF8FD3A6",
+}
 
-def style_sig(cell):
+
+def remap(rgb):
+    return COLOR_MAP.get(rgb, rgb)
+
+
+def style_sig(cell, recolor=False):
     f = cell.fill
     fill = f.fgColor.rgb if (f and f.patternType) else None
     fo = cell.font
+    fontc = fo.color.rgb if fo.color else None
+    if recolor:
+        fill = remap(fill)
+        fontc = remap(fontc)
     return (
         fill,
         fo.bold,
         round(fo.sz, 1) if fo.sz else None,
-        fo.color.rgb if fo.color else None,
+        fontc,
         fo.name,
         cell.alignment.horizontal,
         cell.alignment.vertical,
@@ -46,7 +62,7 @@ def main():
             for col in range(1, 13):
                 oc = ows.cell(row=old_idx, column=col)
                 ec = ews.cell(row=new_idx, column=col)
-                os_, es_ = style_sig(oc), style_sig(ec)
+                os_, es_ = style_sig(oc, recolor=True), style_sig(ec)
                 if os_ != es_:
                     errors.append(
                         f"{sheet} new r{new_idx} (orig r{old_idx}) col{col}: STYLE "
