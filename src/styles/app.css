@@ -110,6 +110,8 @@ button { font-family: inherit; }
 .kpi .k-sub { font-size: 11px; color: var(--ink-2); margin-top: 5px; }
 .kpi .k-bar-track { height: 7px; border-radius: 99px; background: var(--line-soft); margin-top: 10px; overflow: hidden; }
 .kpi .k-bar-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--coral), var(--coral-deep)); transition: width .4s var(--ease-out); }
+.kpi .k-bar-fill.teal { background: linear-gradient(90deg, var(--teal-soft), #2E8B74); }
+[data-theme="dark"] .kpi .k-bar-fill.teal { background: linear-gradient(90deg, #2E8B74, #45B596); }
 .kpi.hero { grid-column: span 1; background: linear-gradient(135deg, color-mix(in srgb, var(--coral) 14%, var(--bg-card)) 0%, var(--bg-card) 65%); }
 .kpi.hero .k-value { font-size: 38px; }
 .kpi .k-mini { display: flex; gap: 5px; margin-top: 9px; flex-wrap: wrap; }
@@ -176,13 +178,34 @@ button { font-family: inherit; }
 .ms-opt .ct { color: var(--ink-3); font-size: 11px; font-family: var(--font-display); }
 
 /* ---------------- Phase banner ---------------- */
+@property --phase-ang { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+
 .phase {
-  display: flex; align-items: center; gap: 14px; margin: 30px 0 14px; padding: 14px 18px;
-  background: linear-gradient(135deg, var(--teal) 0%, var(--teal-soft) 100%);
-  border-radius: var(--r-lg); color: #fff; box-shadow: var(--shadow-card);
+  display: flex; align-items: center; gap: 14px; margin: 32px 0 16px; padding: 15px 20px;
+  position: relative; isolation: isolate;
+  background: linear-gradient(120deg, #0C2A26 0%, #16403A 48%, #20534B 100%);
+  border-radius: var(--r-lg); color: #fff;
+  box-shadow: 0 6px 24px rgba(16,51,47,.28);
 }
-[data-theme="dark"] .phase { background: linear-gradient(135deg, #16211e, #1d2c28); border: 1px solid var(--line); }
-.phase:first-of-type { margin-top: 4px; }
+.phase:first-of-type { margin-top: 6px; }
+[data-theme="dark"] .phase { background: linear-gradient(120deg, #0B201D 0%, #14322D 50%, #1B423B 100%); }
+
+/* rotating gradient frame — Gemini-style */
+.phase::before {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1.5px;
+  background: conic-gradient(from var(--phase-ang), var(--coral), #36E3C6, #1A4238, #36E3C6, var(--coral));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  animation: phaseSpin 5s linear infinite; pointer-events: none; z-index: 2;
+}
+/* soft rotating glow halo behind the banner */
+.phase::after {
+  content: ""; position: absolute; inset: -2px; border-radius: inherit; z-index: -1;
+  background: conic-gradient(from var(--phase-ang), transparent 0%, var(--coral) 12%, transparent 30%, #36E3C6 55%, transparent 74%, var(--coral) 92%, transparent 100%);
+  filter: blur(12px); opacity: .5; animation: phaseSpin 5s linear infinite; pointer-events: none;
+}
+@keyframes phaseSpin { to { --phase-ang: 360deg; } }
+@media (prefers-reduced-motion: reduce) { .phase::before, .phase::after { animation: none; } }
 .phase .p-num {
   font-family: var(--font-display); font-weight: 800; font-size: 13px;
   background: var(--coral); color: #fff; padding: 4px 11px; border-radius: var(--r-pill); white-space: nowrap;

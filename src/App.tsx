@@ -123,31 +123,41 @@ export default function App() {
     return ids;
   }, [sheet, vis]);
 
-  // stats for active sheet
+  // stats for active sheet.
+  //  - Kapsam (coverage)  = seçili / toplam  → fills as you tick
+  //  - Tamamlanma (done)  = seçili & Durum "Tamamlandı" / seçili
   const stats: Stats = useMemo(() => {
     const total = totalItems(sheet);
-    let selCount = 0; let tasksTotal = 0; let tasksSel = 0;
+    let selCount = 0; let doneSel = 0; let tasksTotal = 0; let tasksSel = 0;
     const priTotals: Record<string, number> = {}; const priSel: Record<string, number> = {};
     const phaseAgg = sheet.phases.map((p) => ({ num: splitPhaseTitle(p.title).num, total: 0, selected: 0 }));
+    const durumOf = (id: string, original: string) => (edits[id]?.durum ?? original) || '';
     sheet.phases.forEach((p, pi) => {
       for (const s of p.sections) for (const t of s.tasks) {
         tasksTotal++;
-        const ids = leafIds(t);
-        const sc = ids.filter((id) => selected.has(id)).length;
-        selCount += sc;
         if (selected.has(t.id)) tasksSel++;
+        const leaves: { id: string; durum: string }[] = [{ id: t.id, durum: t.durum }, ...t.subtasks.map((st) => ({ id: st.id, durum: st.durum }))];
+        let scTask = 0;
+        for (const it of leaves) {
+          if (selected.has(it.id)) {
+            selCount++; scTask++;
+            if (durumOf(it.id, it.durum) === 'Tamamlandı') doneSel++;
+          }
+        }
         const pr = t.oncelik || 'Düşük';
         priTotals[pr] = (priTotals[pr] || 0) + 1;
         if (selected.has(t.id)) priSel[pr] = (priSel[pr] || 0) + 1;
-        phaseAgg[pi].total += ids.length;
-        phaseAgg[pi].selected += sc;
+        phaseAgg[pi].total += leaves.length;
+        phaseAgg[pi].selected += scTask;
       }
     });
     const byPriority = PRI_META.map((pm) => ({ ...pm, total: priTotals[pm.label] || 0, selected: priSel[pm.label] || 0 }))
       .filter((x) => x.total > 0)
       .sort((a, b) => priRank(a.label) - priRank(b.label));
-    return { total, selected: selCount, tasksTotal, tasksSelected: tasksSel, byPriority, phases: phaseAgg };
-  }, [sheet, selected]);
+    const coveragePct = total === 0 ? 0 : Math.round((selCount / total) * 100);
+    const completionPct = selCount === 0 ? 0 : Math.round((doneSel / selCount) * 100);
+    return { total, selected: selCount, done: doneSel, tasksTotal, tasksSelected: tasksSel, coveragePct, completionPct, byPriority, phases: phaseAgg };
+  }, [sheet, selected, edits]);
 
   const tabCounts = useMemo(() => {
     const out = {} as Record<SheetName, { total: number; selected: number }>;

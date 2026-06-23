@@ -1,8 +1,11 @@
 export interface Stats {
   total: number;
   selected: number;
+  done: number;
   tasksTotal: number;
   tasksSelected: number;
+  coveragePct: number;
+  completionPct: number;
   byPriority: { label: string; cls: string; color: string; selected: number; total: number }[];
   phases: { num: string; selected: number; total: number }[];
 }
@@ -12,26 +15,26 @@ function pct(a: number, b: number) {
 }
 
 export function KpiStrip({ stats }: { stats: Stats }) {
-  const completion = pct(stats.selected, stats.total);
   return (
     <div className="kpi-strip">
       <div className="kpi hero">
         <div className="k-label">Tamamlanma</div>
-        <div className="k-value">{completion}<span style={{ fontSize: 20 }}>%</span></div>
+        <div className="k-value">{stats.completionPct}<span style={{ fontSize: 20 }}>%</span></div>
+        <div className="k-sub">{stats.done} / {stats.selected} seçili görev tamamlandı</div>
+        <div className="k-bar-track"><div className="k-bar-fill" style={{ width: stats.completionPct + '%' }} /></div>
+      </div>
+
+      <div className="kpi">
+        <div className="k-label">Kapsam</div>
+        <div className="k-value">{stats.coveragePct}<span style={{ fontSize: 16 }}>%</span></div>
         <div className="k-sub">{stats.selected} / {stats.total} madde seçili</div>
-        <div className="k-bar-track"><div className="k-bar-fill" style={{ width: completion + '%' }} /></div>
+        <div className="k-bar-track"><div className="k-bar-fill teal" style={{ width: stats.coveragePct + '%' }} /></div>
       </div>
 
       <div className="kpi">
         <div className="k-label">Seçili Madde</div>
         <div className="k-value">{stats.selected}</div>
         <div className="k-sub">{stats.tasksSelected} ana görev</div>
-      </div>
-
-      <div className="kpi">
-        <div className="k-label">Toplam Madde</div>
-        <div className="k-value">{stats.total}</div>
-        <div className="k-sub">{stats.tasksTotal} ana görev</div>
       </div>
 
       <div className="kpi">
